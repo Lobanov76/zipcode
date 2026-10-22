@@ -49,6 +49,21 @@ def main():
         encoding="utf-8",
     )
     print(f"docs/data.js: {len(free)} бесплатных, {len(paid)} платных (только заголовки)")
+    stamp_versions()
+
+
+def stamp_versions():
+    """Дописывает к файлам в index.html метку версии (?v=...), чтобы Telegram
+    не показывал старое приложение из памяти телефона после обновления."""
+    import hashlib
+    import re
+    index = ROOT / "docs/index.html"
+    html = index.read_text(encoding="utf-8")
+    for name in ("styles.css", "config.js", "data.js", "app.js"):
+        v = hashlib.md5((ROOT / "docs" / name).read_bytes()).hexdigest()[:8]
+        html = re.sub(rf'"{re.escape(name)}(\?v=\w+)?"', f'"{name}?v={v}"', html)
+    index.write_text(html, encoding="utf-8")
+    print("index.html: версии файлов обновлены")
 
 
 if __name__ == "__main__":
