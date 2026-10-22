@@ -233,7 +233,7 @@
       <section class="ticket">
         <p class="ticket__name">Участник zipcode</p>
         <p class="ticket__price">${esc(CFG.price)}</p>
-        <p class="ticket__period">${esc(CFG.period)}, отменить можно в любой момент</p>
+        <p class="ticket__period">${esc(CFG.period)}</p>
         <ul>${inside.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>
         ${memberBlock}
       </section>
@@ -244,7 +244,7 @@
           <li>Оплачиваешь подписку через Tribute — картой, прямо в Telegram.</li>
           <li>Бот Tribute сразу присылает ссылку в закрытый канал zipcode.</li>
           <li>Уроки курса в этом приложении открываются кнопкой и ведут в канал.</li>
-          <li>Если отменишь подписку — доступ закроется в конце оплаченного месяца.</li>
+          <li>Подписка продлевается каждый месяц, пока она оплачена — доступ открыт.</li>
         </ol>
       </section>
 
