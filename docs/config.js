@@ -1,7 +1,7 @@
 // Ссылки приватки. Заполни после того, как создашь каналы и Tribute (см. SETUP.md).
 window.ZIP_CONFIG = {
   // Ссылка на подписку в Tribute (t.me/tribute/app?startapp=...)
-  tributeLink: "",
+  tributeLink: "https://t.me/tribute/app?startapp=s1a2S",
   // Пригласительная ссылка в закрытый канал участников (t.me/+...)
   membersLink: "https://t.me/+4uyEk0otfMNmY2Ey",
   // Публичный канал zipcode
