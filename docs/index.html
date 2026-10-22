@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>zipcode</title>
+  <meta name="description" content="zipcode — вайбкодинг с нуля: первый сайт за 3 вечера, курс и первые клиенты.">
+  <meta name="theme-color" content="#181818">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+  <main id="app" class="app" aria-live="polite"></main>
+
+  <nav class="tabs" aria-label="Разделы">
+    <button class="tab" data-tab="home" aria-current="page">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V20h-5.5v-5.5h-5V20H4z"/></svg>
+      <span>Главная</span>
+    </button>
+    <button class="tab" data-tab="course">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h7v14H4zM13 5h7v6h-7zM13 13h7v6h-7z"/></svg>
+      <span>Курс</span>
+    </button>
+    <button class="tab" data-tab="access">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10V7a5 5 0 0 1 10 0v3M5 10h14v10H5zM12 14v2"/></svg>
+      <span>Доступ</span>
+    </button>
+  </nav>
+
+  <div class="sheet" id="sheet" hidden>
+    <div class="sheet__scrim" data-close></div>
+    <div class="sheet__panel" role="dialog" aria-modal="true" aria-labelledby="sheet-title"></div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
