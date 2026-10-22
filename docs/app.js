@@ -243,7 +243,7 @@
     const memberBlock = state.member
       ? `<button class="btn btn--red" data-open="members">Открыть закрытый канал</button>`
       : `<button class="btn btn--red" data-open="tribute">Оформить за ${esc(CFG.price)} ${esc(CFG.period)}</button>
-         <button class="btn btn--ghost" data-action="already">Я уже подписан</button>`;
+         <button class="btn btn--ghost" data-action="already">Проверить подписку</button>`;
 
     return `${top()}
       <section class="ticket">
@@ -339,27 +339,43 @@
     else window.open(url, "_blank", "noopener");
   }
 
-  function openPaid(id) {
+  async function openPaid(id) {
     const l = byId[id];
-    const post = CFG.paidPosts[id];
-    const actions = state.member
-      ? [
-          { label: "Открыть урок в канале", cls: "btn--red", run: () => openLink(post) },
-          isDone(id)
-            ? { label: "Урок пройден", cls: "btn--ghost", run: hideSheet }
-            : { label: "Отметить пройденным", cls: "btn--ghost", run: () => { markDone(id); hideSheet(); render(); } },
-        ]
-      : [
-          { label: `Открыть доступ за ${CFG.price}`, cls: "btn--red", run: () => { hideSheet(); setTab("access"); } },
-          { label: "Я уже подписан", cls: "btn--ghost", run: () => { setMember(); openPaid(id); } },
-        ];
-    showSheet(l.title, l.summary, actions);
+    // Без подписки — сразу на оплату. Перед этим перепроверяем: вдруг только что оплатил
+    if (!state.member) await checkAccess();
+    if (!state.member) {
+      haptic("warning");
+      openLink(CFG.tributeLink);
+      return;
+    }
+    showSheet(l.title, l.summary, [
+      { label: "Открыть урок в канале", cls: "btn--red", run: () => openLink(CFG.paidPosts[id]) },
+      isDone(id)
+        ? { label: "Урок пройден", cls: "btn--ghost", run: hideSheet }
+        : { label: "Отметить пройденным", cls: "btn--ghost", run: () => { markDone(id); hideSheet(); render(); } },
+    ]);
   }
 
-  function setMember() {
-    state.member = true;
-    store.save();
-    render();
+  /* ---------- Проверка подписки на сервере ----------
+     Сервер проверяет подпись Telegram и смотрит, состоит ли человек в zipcode club
+     (туда добавляет Tribute после оплаты). Ответ на слово не принимаем. */
+
+  async function checkAccess() {
+    if (!tg || !tg.initData || !CFG.apiUrl) return state.member;
+    try {
+      const res = await fetch(`${CFG.apiUrl}/api/access`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ initData: tg.initData }),
+      });
+      const data = await res.json();
+      if (typeof data.member === "boolean" && data.member !== state.member) {
+        state.member = data.member;
+        store.save();
+        render();
+      }
+    } catch (_) {}
+    return state.member;
   }
 
   /* ---------- Нижний лист ---------- */
@@ -406,10 +422,14 @@
 
     if (d.action === "done") { markDone(d.id); return render(); }
     if (d.action === "already") {
-      return showSheet("Уже оплатил?", "После оплаты бот Tribute присылает ссылку в закрытый канал. Если ты в канале — открой курс, уроки будут доступны.", [
-        { label: "Да, я в канале", cls: "btn--red", run: () => { setMember(); hideSheet(); } },
-        { label: "Написать в поддержку", cls: "btn--ghost", run: () => openLink(CFG.supportLink) },
-      ]);
+      t.textContent = "Проверяем…";
+      return checkAccess().then((member) => member
+        ? showSheet("Подписка активна", "Все уроки курса открыты. Выбирай урок во вкладке «Курс».", [
+            { label: "Открыть курс", cls: "btn--red", run: () => { hideSheet(); setTab("course"); } },
+          ])
+        : showSheet("Подписка не найдена", "Если ты только что оплатил, подожди минуту: Tribute добавляет в клуб не мгновенно. Потом нажми «Проверить подписку» ещё раз.", [
+            { label: `Оформить за ${CFG.price} ${CFG.period}`, cls: "btn--red", run: () => openLink(CFG.tributeLink) },
+          ])).finally(() => render());
     }
     if (d.action === "reset") {
       return showSheet("Сбросить прогресс?", "Отметки о пройденных шагах удалятся. Подписка и доступ к каналу останутся.", [
@@ -427,6 +447,7 @@
   store.load().then((saved) => {
     if (saved) state = { done: saved.done || [], member: !!saved.member };
     render();
+    checkAccess();
     // Полоска прогресса анимируется только при первом открытии, а не на каждой перерисовке
     setTimeout(() => document.body.classList.add("booted"), 800);
   });

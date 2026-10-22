@@ -1,5 +1,7 @@
 // Ссылки приватки. Заполни после того, как создашь каналы и Tribute (см. SETUP.md).
 window.ZIP_CONFIG = {
+  // Сервер бота: проверяет, оплачена ли подписка
+  apiUrl: "https://zipcode-bot.zipcodeai.workers.dev",
   // Ссылка на подписку в Tribute (t.me/tribute/app?startapp=...)
   tributeLink: "https://t.me/tribute/app?startapp=s1a2S",
   // Пригласительная ссылка в закрытый канал участников (t.me/+...)

@@ -1,3 +1,7 @@
 name = "zipcode-bot"
 main = "worker.js"
 compatibility_date = "2026-10-01"
+
+[vars]
+# Закрытый канал zipcode club: кто в нём состоит — тот оплатил подписку в Tribute
+CLUB_CHAT_ID = "-1004330177248"

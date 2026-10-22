@@ -54,9 +54,71 @@ async function onMessage(env, msg) {
   return tg(env, "sendMessage", { chat_id, text: HELP, reply_markup: appButton("Открыть zipcode") });
 }
 
+/* ---------- Проверка подписки ----------
+   Оплатил в Tribute = состоит в закрытом канале zipcode club.
+   Мини-приложение присылает initData от Telegram, сервер проверяет подпись
+   и спрашивает у Telegram, есть ли человек в канале. */
+
+const APP_ORIGIN = "https://lobanov76.github.io";
+const MEMBER_STATUSES = ["creator", "administrator", "member", "restricted"];
+
+const cors = {
+  "Access-Control-Allow-Origin": APP_ORIGIN,
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "content-type",
+};
+const json = (data, status = 200) => Response.json(data, { status, headers: cors });
+
+async function hmac(key, data) {
+  const raw = typeof key === "string" ? new TextEncoder().encode(key) : key;
+  const k = await crypto.subtle.importKey("raw", raw, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  return new Uint8Array(await crypto.subtle.sign("HMAC", k, new TextEncoder().encode(data)));
+}
+const hex = (bytes) => [...bytes].map((b) => b.toString(16).padStart(2, "0")).join("");
+
+// Возвращает пользователя, если initData действительно выдал Telegram
+async function verifyInitData(env, initData) {
+  if (!initData) return null;
+  const params = new URLSearchParams(initData);
+  const hash = params.get("hash");
+  if (!hash) return null;
+  params.delete("hash");
+  const check = [...params.entries()].map(([k, v]) => `${k}=${v}`).sort().join("\n");
+  const secret = await hmac("WebAppData", env.BOT_TOKEN);
+  if (hex(await hmac(secret, check)) !== hash) return null;
+  if (Date.now() / 1000 - Number(params.get("auth_date")) > 86400) return null;
+  try { return JSON.parse(params.get("user")); } catch { return null; }
+}
+
+async function isMember(env, userId) {
+  const res = await tg(env, "getChatMember", { chat_id: env.CLUB_CHAT_ID, user_id: userId });
+  return Boolean(res.ok && MEMBER_STATUSES.includes(res.result.status) && res.result.is_member !== false);
+}
+
+async function onAccess(request, env) {
+  if (request.method === "OPTIONS") return new Response(null, { headers: cors });
+  let body;
+  try { body = await request.json(); } catch { return json({ error: "bad request" }, 400); }
+  const user = await verifyInitData(env, body.initData);
+  if (!user) return json({ error: "Открой приложение из бота @zipcodeai_bot" }, 401);
+  return json({ member: await isMember(env, user.id) });
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+
+    if (url.pathname === "/api/access") return onAccess(request, env);
+
+    // Проверка, что бот видит закрытый канал: /club?key=WEBHOOK_SECRET
+    if (url.pathname === "/club") {
+      if (url.searchParams.get("key") !== env.WEBHOOK_SECRET) return new Response("Нет доступа", { status: 403 });
+      const id = url.searchParams.get("id") || env.CLUB_CHAT_ID;
+      const chat = await tg(env, "getChat", { chat_id: id });
+      const me = await tg(env, "getMe", {});
+      const admin = me.ok ? await tg(env, "getChatMember", { chat_id: id, user_id: me.result.id }) : null;
+      return Response.json({ chat: chat.ok ? chat.result.title : chat.description, botStatus: admin && admin.ok ? admin.result.status : admin && admin.description });
+    }
 
     // Разовая настройка: открыть /setup?key=WEBHOOK_SECRET в браузере после деплоя
     if (url.pathname === "/setup") {
