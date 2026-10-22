@@ -30,5 +30,8 @@ window.ZIP_CONFIG = {
     "34-edit-publish": "",
     "41-first-client": "",
     "42-deal": "",
+    "51-agents": "",
+    "52-telegram-bot": "",
+    "53-automation": "",
   },
 };
