@@ -63,10 +63,10 @@
   const byId = Object.fromEntries([...free, ...paid].map((l) => [l.id, l]));
 
   const route = [
-    { name: "Узнай, что такое вайбкодинг", hint: "7 минут чтения", done: () => isDone("00-start"), go: () => openLesson("00-start") },
-    { name: "Поставь инструменты", hint: "Марафон, день 1", done: () => isDone("01-day-1"), go: () => openLesson("01-day-1") },
-    { name: "Собери первый сайт", hint: "Марафон, день 2", done: () => isDone("02-day-2"), go: () => openLesson("02-day-2") },
-    { name: "Выложи его в интернет", hint: "Марафон, день 3", done: () => isDone("03-day-3"), go: () => openLesson("03-day-3") },
+    { name: "Разберись, что такое вайбкодинг", hint: "8 минут чтения", done: () => isDone("00-start"), go: () => openLesson("00-start") },
+    { name: "Собери первую страницу", hint: "Вечер 1: мастерская", done: () => isDone("01-day-1"), go: () => openLesson("01-day-1") },
+    { name: "Сделай сайт о себе", hint: "Вечер 2: агент берёт интервью", done: () => isDone("02-day-2"), go: () => openLesson("02-day-2") },
+    { name: "Получи свой адрес в интернете", hint: "Вечер 3: ссылка и QR-код", done: () => isDone("03-day-3"), go: () => openLesson("03-day-3") },
     { name: "Открой курс участников", hint: `${CFG.price} ${CFG.period}`, done: () => state.member, go: () => setTab("access") },
     { name: "Найди первого клиента", hint: "Уроки 6 и 7 курса", done: () => isDone("06-first-client") && isDone("07-deal"), go: () => openPaid("06-first-client") },
   ];
@@ -154,7 +154,7 @@
     const bars = route.map((s, i) => `<span class="${s.done() ? "done" : i === next ? "next" : ""}"></span>`).join("");
 
     const title = doneCount === 0
-      ? "Первый сайт за 3 вечера"
+      ? "Свой адрес в интернете"
       : doneCount === route.length ? "Путь пройден. Дальше — заказы" : "Продолжаем маршрут";
 
     const cta = next === -1
@@ -205,8 +205,8 @@
       </section>
 
       <section class="section">
-        <div class="group-head"><h2 class="section__title">Марафон: первый сайт за 3 вечера</h2><span class="count">${daysDone} из ${days.length}</span></div>
-        <p class="section__lead">Бесплатно. 30–60 минут в день, в конце — сайт по ссылке.</p>
+        <div class="group-head"><h2 class="section__title">Марафон «Свой адрес в интернете»</h2><span class="count">${daysDone} из ${days.length}</span></div>
+        <p class="section__lead">Бесплатно. 3 вечера по 40–60 минут. В конце — твой сайт по ссылке и QR-код.</p>
         <ul class="lessons">${days.map((l) => lessonRow(l, false)).join("")}</ul>
       </section>
 
@@ -219,7 +219,7 @@
 
   function accessView() {
     const inside = [
-      "7 уроков: дизайн без «нейросетевого» вида, анимации, мобильная версия, настройка Claude, фото и видео через ИИ, первый клиент, цена и предоплата",
+      "7 уроков: дизайн с характером, анимации, мобильная версия, настройка Claude, фото и видео через ИИ, первый клиент, цена и предоплата",
       "Готовые промпты под каждый шаг — копируешь и работаешь",
       "Закрытый чат участников и разбор твоих сайтов",
       "Новые уроки каждую неделю",
@@ -249,8 +249,8 @@
       </section>
 
       <section class="section">
-        <h2 class="section__title">Чего мы не обещаем</h2>
-        <p class="note">Программистом за неделю ты не станешь, и деньги сами не придут. zipcode даёт систему: что делать, в каком порядке и как превратить навык в заказы. Дальше решают руки и регулярность.</p>
+        <h2 class="section__title">Как здесь учатся</h2>
+        <p class="note">Здесь нет лекций ради лекций. Каждый урок заканчивается делом: страница, ссылка, отправленное клиенту сообщение. Сделал задание — у тебя на руках результат. Пропустил — его не будет, волшебной кнопки нет.</p>
       </section>
 
       <section class="section">
