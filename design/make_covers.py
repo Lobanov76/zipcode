@@ -55,6 +55,14 @@ def render(name, params, size):
     print("готово:", name)
 
 
+STORIES = [
+    # имя файла, слово-призрак, надпись сверху, заголовок, подпись внизу
+    ("story-01", "zip", "Новый канал", "Учимся делать сайты с ИИ", "Бесплатный марафон — в @zipcodeai_bot"),
+    ("story-02", "3", "Марафон", "Свой адрес в интернете за 3 вечера", "Открой бота → «Открыть»"),
+    ("story-03", "8", "Новый пост", "8 сайтов на первый месяц", "Читай в канале zipcode"),
+]
+
+
 def main():
     OUT.mkdir(exist_ok=True)
     for name, n, g, k, t in COVERS:
@@ -62,6 +70,9 @@ def main():
     # Аватарки: квадрат, подпись снизу показывает, где канал, а где бот
     for name, tag in AVATARS:
         render(name, {"sq": 1, "tag": tag}, "1080,1080")
+    # Вертикальные картинки для сторис
+    for name, g, k, title, cta in STORIES:
+        render(name, {"story": 1, "g": g, "k": k, "t": title, "cta": cta}, "1080,1920")
 
 
 if __name__ == "__main__":
