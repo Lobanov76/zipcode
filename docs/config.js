@@ -3,7 +3,7 @@ window.ZIP_CONFIG = {
   // Ссылка на подписку в Tribute (t.me/tribute/app?startapp=...)
   tributeLink: "",
   // Пригласительная ссылка в закрытый канал участников (t.me/+...)
-  membersLink: "",
+  membersLink: "https://t.me/+4uyEk0otfMNmY2Ey",
   // Публичный канал zipcode
   channelLink: "https://t.me/zipcode_vibecoding",
   // Куда писать в поддержку (t.me/username)
