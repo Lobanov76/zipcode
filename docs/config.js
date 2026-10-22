@@ -5,7 +5,7 @@ window.ZIP_CONFIG = {
   // Пригласительная ссылка в закрытый канал участников (t.me/+...)
   membersLink: "",
   // Публичный канал zipcode
-  channelLink: "",
+  channelLink: "https://t.me/zipcode_vibecoding",
   // Куда писать в поддержку (t.me/username)
   supportLink: "",
   // Цена для показа на экране
