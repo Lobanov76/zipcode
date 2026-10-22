@@ -242,7 +242,7 @@
     ];
     const memberBlock = state.member
       ? `<button class="btn btn--red" data-open="members">Открыть закрытый канал</button>`
-      : `<button class="btn btn--red" data-open="tribute">Оформить за ${esc(CFG.price)} ${esc(CFG.period)}</button>
+      : `<button class="btn btn--red" data-action="buy">Оформить за ${esc(CFG.price)} ${esc(CFG.period)}</button>
          <button class="btn btn--ghost" data-action="already">Проверить подписку</button>`;
 
     return `${top()}
@@ -257,8 +257,9 @@
       <section class="section">
         <h2 class="section__title">Как это работает</h2>
         <ol class="steps">
-          <li>Оплачиваешь подписку через Tribute — картой, прямо в Telegram.</li>
-          <li>Бот Tribute сразу присылает ссылку в закрытый канал zipcode.</li>
+          <li>Жмёшь «Оформить» — откроется личка автора с готовым сообщением.</li>
+          <li>Договариваешься об оплате: 1 месяц или сразу 3 месяца.</li>
+          <li>После оплаты тебя добавляют в закрытый канал zipcode club.</li>
           <li>Уроки курса в этом приложении открываются кнопкой и ведут в канал.</li>
           <li>Подписка продлевается каждый месяц, пока она оплачена — доступ открыт.</li>
         </ol>
@@ -339,13 +340,34 @@
     else window.open(url, "_blank", "noopener");
   }
 
+  /* ---------- Покупка ----------
+     Оплата через личку автора. Ник лежит на сервере, в публичный код не попадает. */
+
+  function buy() {
+    showSheet("Оформить подписку", "Выбери срок — откроется личка автора с готовым сообщением.", [
+      { label: `1 месяц — ${CFG.price}`, cls: "btn--red", run: () => openPay("1m") },
+      { label: `3 месяца — ${CFG.price3}`, cls: "btn--ghost", run: () => openPay("3m") },
+    ]);
+  }
+
+  async function openPay(plan) {
+    try {
+      const res = await fetch(`${CFG.apiUrl}/api/pay-link?plan=${plan}`);
+      const data = await res.json();
+      hideSheet();
+      openLink(data.url);
+    } catch {
+      showSheet("Нет связи", "Не получилось открыть оплату. Проверь интернет и попробуй ещё раз.", []);
+    }
+  }
+
   async function openPaid(id) {
     const l = byId[id];
     // Без подписки — сразу на оплату. Перед этим перепроверяем: вдруг только что оплатил
     if (!state.member) await checkAccess();
     if (!state.member) {
       haptic("warning");
-      openLink(CFG.tributeLink);
+      buy();
       return;
     }
     showSheet(l.title, l.summary, [
@@ -358,7 +380,7 @@
 
   /* ---------- Проверка подписки на сервере ----------
      Сервер проверяет подпись Telegram и смотрит, состоит ли человек в zipcode club
-     (туда добавляет Tribute после оплаты). Ответ на слово не принимаем. */
+     (туда добавляют после оплаты). Ответ на слово не принимаем. */
 
   async function checkAccess() {
     if (!tg || !tg.initData || !CFG.apiUrl) return state.member;
@@ -415,11 +437,11 @@
       return;
     }
 
-    if (d.open === "tribute") return openLink(CFG.tributeLink);
     if (d.open === "members") return openLink(CFG.membersLink);
     if (d.open === "channel") return openLink(CFG.channelLink);
     if (d.open === "support") return openLink(CFG.supportLink);
 
+    if (d.action === "buy") return buy();
     if (d.action === "done") { markDone(d.id); return render(); }
     if (d.action === "already") {
       t.textContent = "Проверяем…";
@@ -427,8 +449,8 @@
         ? showSheet("Подписка активна", "Все уроки курса открыты. Выбирай урок во вкладке «Курс».", [
             { label: "Открыть курс", cls: "btn--red", run: () => { hideSheet(); setTab("course"); } },
           ])
-        : showSheet("Подписка не найдена", "Если ты только что оплатил, подожди минуту: Tribute добавляет в клуб не мгновенно. Потом нажми «Проверить подписку» ещё раз.", [
-            { label: `Оформить за ${CFG.price} ${CFG.period}`, cls: "btn--red", run: () => openLink(CFG.tributeLink) },
+        : showSheet("Подписка не найдена", "Если ты уже оплатил, дождись, пока тебя добавят в zipcode club, и нажми «Проверить подписку» ещё раз.", [
+            { label: `Оформить за ${CFG.price} ${CFG.period}`, cls: "btn--red", run: buy },
           ])).finally(() => render());
     }
     if (d.action === "reset") {

@@ -110,6 +110,14 @@ export default {
 
     if (url.pathname === "/api/access") return onAccess(request, env);
 
+    // Ссылка на оплату: личка автора. Ник хранится в секретах (PAY_USERNAME), не в публичном коде
+    if (url.pathname === "/api/pay-link") {
+      if (request.method === "OPTIONS") return new Response(null, { headers: cors });
+      const plan = url.searchParams.get("plan") === "3m" ? "на 3 месяца" : "на 1 месяц";
+      const text = `Привет! Хочу оформить подписку zipcode club ${plan}. Как оплатить?`;
+      return json({ url: `https://t.me/${env.PAY_USERNAME}?text=${encodeURIComponent(text)}` });
+    }
+
     // Проверка, что бот видит закрытый канал: /club?key=WEBHOOK_SECRET
     if (url.pathname === "/club") {
       if (url.searchParams.get("key") !== env.WEBHOOK_SECRET) return new Response("Нет доступа", { status: 403 });

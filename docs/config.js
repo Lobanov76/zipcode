@@ -1,9 +1,7 @@
-// Ссылки приватки. Заполни после того, как создашь каналы и Tribute (см. SETUP.md).
+// Ссылки приватки. Заполни после того, как создашь каналы (см. SETUP.md).
 window.ZIP_CONFIG = {
   // Сервер бота: проверяет, оплачена ли подписка
   apiUrl: "https://zipcode-bot.zipcodeai.workers.dev",
-  // Ссылка на подписку в Tribute (t.me/tribute/app?startapp=...)
-  tributeLink: "https://t.me/tribute/app?startapp=s1a2S",
   // Пригласительная ссылка в закрытый канал участников (t.me/+...)
   membersLink: "https://t.me/+4uyEk0otfMNmY2Ey",
   // Публичный канал zipcode
@@ -12,6 +10,7 @@ window.ZIP_CONFIG = {
   supportLink: "",
   // Цена для показа на экране
   price: "$19",
+  price3: "$55",
   period: "в месяц",
   // Ссылки на посты с платными уроками в закрытом канале: id урока -> t.me/c/.../...
   paidPosts: {
