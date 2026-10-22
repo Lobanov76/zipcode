@@ -36,6 +36,8 @@ AVATARS = [
     ("avatar", ""),
     ("avatar-channel", "channel"),
     ("avatar-bot", "private"),
+    ("avatar-chat", "chat"),
+    ("avatar-club", "club"),
 ]
 
 
