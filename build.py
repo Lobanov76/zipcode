@@ -33,7 +33,13 @@ def main():
         lesson["body"] = body
         free.append(lesson)
 
-    paid = [read(path)[0] for path in sorted((ROOT / "content/paid").glob("*.md"))]
+    paid = []
+    for path in sorted((ROOT / "content/paid").glob("*.md")):
+        if path.name.startswith("_"):
+            continue  # внутренние заметки (план спринта и т.п.)
+        lesson = read(path)[0]
+        lesson["track"] = path.stem[0]  # первая цифра — направление
+        paid.append(lesson)
 
     data = {"free": free, "paid": paid}
     out = ROOT / "docs/data.js"

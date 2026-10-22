@@ -68,7 +68,7 @@
     { name: "Сделай сайт о себе", hint: "Вечер 2: агент берёт интервью", done: () => isDone("02-day-2"), go: () => openLesson("02-day-2") },
     { name: "Получи свой адрес в интернете", hint: "Вечер 3: ссылка и QR-код", done: () => isDone("03-day-3"), go: () => openLesson("03-day-3") },
     { name: "Открой курс участников", hint: `${CFG.price} ${CFG.period}`, done: () => state.member, go: () => setTab("access") },
-    { name: "Найди первого клиента", hint: "Уроки 6 и 7 курса", done: () => isDone("06-first-client") && isDone("07-deal"), go: () => openPaid("06-first-client") },
+    { name: "Найди первого клиента", hint: "Направление «Клиенты и воронка»", done: () => isDone("41-first-client") && isDone("42-deal"), go: () => openPaid("41-first-client") },
   ];
 
   const nextStop = () => route.findIndex((s) => !s.done());
@@ -193,6 +193,15 @@
     </button></li>`;
   }
 
+  // Направления курса: первая цифра номера урока
+  const TRACKS = [
+    { id: "1", name: "Фундамент", lead: "API, MCP, скиллы и коннекторы — простыми словами и с практикой." },
+    { id: "2", name: "Сайты-фильмы", lead: "Дизайн с характером, анимации, мобильная версия, фото и видео через ИИ." },
+    { id: "3", name: "Контент-завод", lead: "Вирусные ролики для TikTok, Reels и Shorts через Claude: идея, сценарий, монтаж." },
+    { id: "4", name: "Клиенты и воронка", lead: "Первый клиент, цена и предоплата, воронка YouTube → Telegram." },
+    { id: "5", name: "ИИ-агенты", lead: "Боты и автоматизации, которые работают за тебя и за бизнес." },
+  ];
+
   function courseView() {
     const start = free.filter((l) => l.id === "00-start");
     const days = free.filter((l) => l.id !== "00-start");
@@ -212,14 +221,22 @@
 
       <section class="section">
         <div class="group-head"><h2 class="section__title">Курс участников</h2><span class="count">${paidDone} из ${paid.length}</span></div>
-        <p class="section__lead">Уроки лежат в закрытом канале zipcode. ${state.member ? "Нажми на урок, чтобы открыть его." : `Доступ — ${CFG.price} ${CFG.period}.`}</p>
-        <ul class="lessons">${paid.map((l) => lessonRow(l, true)).join("")}</ul>
-      </section>`;
+        <p class="section__lead">5 направлений и 30-дневный спринт в закрытом канале zipcode club. ${state.member ? "Нажми на урок, чтобы открыть его." : `Доступ — ${CFG.price} ${CFG.period}.`}</p>
+      </section>
+      ${TRACKS.map((t) => {
+        const items = paid.filter((l) => l.track === t.id);
+        return `<section class="section">
+          <div class="group-head"><h3 class="section__title">${esc(t.name)}</h3><span class="count">${items.length ? `${items.filter((l) => isDone(l.id)).length} из ${items.length}` : "скоро"}</span></div>
+          <p class="section__lead">${esc(t.lead)}</p>
+          ${items.length ? `<ul class="lessons">${items.map((l) => lessonRow(l, true)).join("")}</ul>` : ""}
+        </section>`;
+      }).join("")}`;
   }
 
   function accessView() {
     const inside = [
-      "7 уроков: дизайн с характером, анимации, мобильная версия, настройка Claude, фото и видео через ИИ, первый клиент, цена и предоплата",
+      "5 направлений на Claude Code: фундамент, сайты-фильмы, вирусные ролики, клиенты и воронка, ИИ-агенты",
+      "30-дневный спринт: задание каждый день, 48 часов на сдачу, разборы раз в неделю",
       "Готовые промпты под каждый шаг — копируешь и работаешь",
       "Закрытый чат участников и разбор твоих сайтов",
       "Новые уроки каждую неделю",

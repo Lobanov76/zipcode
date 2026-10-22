@@ -13,12 +13,16 @@ window.ZIP_CONFIG = {
   period: "в месяц",
   // Ссылки на посты с платными уроками в закрытом канале: id урока -> t.me/c/.../...
   paidPosts: {
-    "01-design": "",
-    "02-motion": "",
-    "03-mobile": "",
-    "04-setup-claude": "",
-    "05-ai-media": "",
-    "06-first-client": "",
-    "07-deal": "",
+    "11-api": "",
+    "12-mcp": "",
+    "13-skills": "",
+    "14-connectors": "",
+    "15-setup-claude": "",
+    "21-design": "",
+    "22-motion": "",
+    "23-mobile": "",
+    "24-ai-media": "",
+    "41-first-client": "",
+    "42-deal": "",
   },
 };
