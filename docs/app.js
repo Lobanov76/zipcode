@@ -221,7 +221,7 @@
 
       <section class="section">
         <div class="group-head"><h2 class="section__title">Курс участников</h2><span class="count">${paidDone} из ${paid.length}</span></div>
-        <p class="section__lead">5 направлений и 30-дневный спринт в закрытом канале zipcode club. ${state.member ? "Нажми на урок, чтобы открыть его." : `Доступ — ${CFG.price} ${CFG.period}.`}</p>
+        <p class="section__lead">5 направлений в закрытом канале zipcode club. ${state.member ? "Нажми на урок, чтобы открыть его." : `Доступ — ${CFG.price} ${CFG.period}.`}</p>
       </section>
       ${TRACKS.map((t) => {
         const items = paid.filter((l) => l.track === t.id);
@@ -236,7 +236,6 @@
   function accessView() {
     const inside = [
       "5 направлений на Claude Code: фундамент, сайты-фильмы, вирусные ролики, клиенты и воронка, ИИ-агенты",
-      "30-дневный спринт: задание каждый день, 48 часов на сдачу, разборы раз в неделю",
       "Готовые промпты под каждый шаг — копируешь и работаешь",
       "Закрытый чат участников и разбор твоих сайтов",
       "Новые уроки каждую неделю",
