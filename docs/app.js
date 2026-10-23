@@ -68,7 +68,7 @@
     { name: "Сделай сайт о себе", hint: "Вечер 2: агент берёт интервью", done: () => isDone("02-day-2"), go: () => openLesson("02-day-2") },
     { name: "Получи свой адрес в интернете", hint: "Вечер 3: ссылка и QR-код", done: () => isDone("03-day-3"), go: () => openLesson("03-day-3") },
     { name: "Открой курс участников", hint: `${CFG.price} ${CFG.period}`, done: () => state.member, go: () => setTab("access") },
-    { name: "Найди первого клиента", hint: "Финал блока «Сайты-фильмы»", done: () => isDone("25-first-client") && isDone("26-deal"), go: () => openPaid("25-first-client") },
+    { name: "Найди первого клиента", hint: "Финал блока «Сайты»", done: () => isDone("25-first-client") && isDone("26-deal"), go: () => openPaid("25-first-client") },
   ];
 
   const nextStop = () => route.findIndex((s) => !s.done());
@@ -195,8 +195,8 @@
 
   // Направления курса: первая цифра номера урока
   const TRACKS = [
-    { id: "1", name: "Фундамент", lead: "API, MCP, скиллы и коннекторы — простыми словами и с практикой." },
-    { id: "2", name: "Сайты-фильмы", lead: "Дизайн с характером, анимации, телефон, фото и видео через ИИ — и в финале первый клиент и первые деньги." },
+    { id: "1", name: "ИИ на пальцах", lead: "API, MCP, скиллы и коннекторы — простыми словами и с практикой." },
+    { id: "2", name: "Сайты", lead: "Дизайн с характером, анимации, телефон, фото и видео через ИИ — и в финале первый клиент и первые деньги." },
     { id: "3", name: "Контент-завод", lead: "Вирусные ролики для TikTok, Reels и Shorts через Claude: идея, сценарий, монтаж." },
     { id: "4", name: "ИИ-агенты", lead: "Боты и автоматизации, которые работают за тебя и за бизнес." },
   ];
@@ -214,7 +214,7 @@
 
       <section class="section">
         <div class="group-head"><h2 class="section__title">Марафон «Свой адрес в интернете»</h2><span class="count">${daysDone} из ${days.length}</span></div>
-        <p class="section__lead">Бесплатно. 3 вечера по 40–60 минут. В конце — твой сайт по ссылке и QR-код.</p>
+        <p class="section__lead">Бесплатно. 3 вечера по 20–30 минут. В конце — твой сайт по ссылке и QR-код.</p>
         <ul class="lessons">${days.map((l) => lessonRow(l, false)).join("")}</ul>
       </section>
 
@@ -234,7 +234,7 @@
 
   function accessView() {
     const inside = [
-      "4 направления на Claude Code: фундамент, сайты-фильмы до первых денег, вирусные ролики, ИИ-агенты",
+      "4 направления на Claude Code: ИИ на пальцах, сайты до первых денег, вирусные ролики, ИИ-агенты",
       "Готовые промпты под каждый шаг — копируешь и работаешь",
       "Закрытый чат участников и разбор твоих сайтов",
       "Новые уроки каждую неделю",
@@ -475,11 +475,26 @@
 
   if (tg && tg.BackButton) tg.BackButton.onClick(() => (sheet.hidden ? closeLesson() : hideSheet()));
 
+  // Заставка держится минимум 1,3 с (успевает доиграть), потом уходит, и экран въезжает
+  const started = performance.now();
+  document.body.classList.add("splashing");
+  function hideSplash() {
+    const splash = document.getElementById("splash");
+    if (!splash) return;
+    setTimeout(() => {
+      splash.classList.add("splash--out");
+      document.body.classList.remove("splashing");
+      enter();
+      setTimeout(() => splash.remove(), 700);
+      // Полоска прогресса анимируется только при первом открытии, а не на каждой перерисовке
+      setTimeout(() => document.body.classList.add("booted"), 800);
+    }, Math.max(0, 1300 - (performance.now() - started)));
+  }
+
   store.load().then((saved) => {
     if (saved) state = { done: saved.done || [], member: !!saved.member };
     render();
     checkAccess();
-    // Полоска прогресса анимируется только при первом открытии, а не на каждой перерисовке
-    setTimeout(() => document.body.classList.add("booted"), 800);
+    hideSplash();
   });
 })();

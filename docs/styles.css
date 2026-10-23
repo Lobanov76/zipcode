@@ -366,3 +366,50 @@ body:not(.booted) .progress .done { animation: fill .5s ease-out backwards; tran
   .envelope__title { font-size: 23px; }
   .ticket__price { font-size: 46px; }
 }
+
+/* ---------- Заставка загрузки ---------- */
+.splash {
+  position: fixed; inset: 0; z-index: 50;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px;
+  background: var(--ink);
+  transition: opacity .6s var(--ease), transform .7s var(--ease);
+  /* Страховка: если скрипт не сработал, заставка всё равно уходит */
+  animation: splash-away .6s var(--ease) 3.5s forwards;
+}
+.splash__mark { font: 700 44px/1 var(--display); letter-spacing: -.04em; white-space: nowrap; }
+.splash__mark span, .splash__mark b {
+  display: inline-block;
+  opacity: 0; filter: blur(10px); transform: translateY(14px);
+  animation: splash-letter .7s var(--ease) forwards;
+}
+.splash__mark b { color: var(--muted); font-weight: 700; }
+.splash__mark :nth-child(1) { animation-delay: .05s; }
+.splash__mark :nth-child(2) { animation-delay: .1s; }
+.splash__mark :nth-child(3) { animation-delay: .15s; }
+.splash__mark :nth-child(4) { animation-delay: .24s; }
+.splash__mark :nth-child(5) { animation-delay: .29s; }
+.splash__mark :nth-child(6) { animation-delay: .34s; }
+.splash__mark :nth-child(7) { animation-delay: .39s; }
+.splash__bar { display: grid; grid-template-columns: repeat(6, 18px); gap: 4px; }
+.splash__bar i { height: 3px; border-radius: 2px; background: var(--ink-3); position: relative; overflow: hidden; }
+.splash__bar i::after {
+  content: ""; position: absolute; inset: 0; background: var(--paper);
+  transform: scaleX(0); transform-origin: left;
+  animation: splash-fill .22s ease-out forwards;
+}
+.splash__bar i:nth-child(1)::after { animation-delay: .45s; }
+.splash__bar i:nth-child(2)::after { animation-delay: .57s; }
+.splash__bar i:nth-child(3)::after { animation-delay: .69s; }
+.splash__bar i:nth-child(4)::after { animation-delay: .81s; }
+.splash__bar i:nth-child(5)::after { animation-delay: .93s; }
+.splash__bar i:nth-child(6)::after { animation-delay: 1.05s; }
+.splash--out { opacity: 0; transform: translateY(-24px) scale(.98); pointer-events: none; }
+@keyframes splash-letter { to { opacity: 1; filter: blur(0); transform: none; } }
+@keyframes splash-fill { to { transform: scaleX(1); } }
+@keyframes splash-away { to { opacity: 0; visibility: hidden; } }
+/* Пока висит заставка, экран не анимируется — его вход стартует после неё */
+body.splashing .app > * { animation: none !important; opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .splash__mark span, .splash__mark b { opacity: 1; filter: none; transform: none; }
+  .splash__bar i::after { transform: none; }
+}
