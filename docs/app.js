@@ -312,22 +312,32 @@
     if (tg && tg.BackButton) reading ? tg.BackButton.show() : tg.BackButton.hide();
   }
 
+  // Плавный вход экрана: блоки поднимаются по очереди. Только при смене экрана, не при каждой отметке
+  function enter() {
+    app.classList.remove("enter");
+    void app.offsetWidth;
+    app.classList.add("enter");
+  }
+
   function setTab(name) {
     reading = null;
     tab = name;
     render();
+    enter();
     window.scrollTo(0, 0);
   }
 
   function openLesson(id) {
     reading = id;
     render();
+    enter();
     window.scrollTo(0, 0);
   }
 
   function closeLesson() {
     reading = null;
     render();
+    enter();
   }
 
   function openLink(url) {

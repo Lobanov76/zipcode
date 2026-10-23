@@ -17,6 +17,7 @@
 
   --gutter: 18px;
   --tabs-h: 64px;
+  --ease: cubic-bezier(.22, 1, .36, 1);
   --safe-b: env(safe-area-inset-bottom, 0px);
 }
 
@@ -40,7 +41,7 @@ a { color: var(--blue); }
 .app {
   max-width: 560px;
   margin: 0 auto;
-  padding: 18px var(--gutter) calc(var(--tabs-h) + var(--safe-b) + 32px);
+  padding: 18px var(--gutter) calc(var(--tabs-h) + var(--safe-b) + 44px);
 }
 
 /* ---------- Шапка ---------- */
@@ -71,6 +72,7 @@ a { color: var(--blue); }
   padding: 22px 18px 20px;
   border-radius: var(--radius);
   background: var(--ink-2);
+  border: 1px solid var(--line);
 }
 .envelope__hello { margin: 0 0 4px; color: var(--muted); font-size: 15px; }
 .envelope__title {
@@ -87,7 +89,7 @@ a { color: var(--blue); }
   gap: 4px;
   margin-bottom: 10px;
 }
-.progress span { height: 4px; border-radius: 2px; background: var(--ink-3); }
+.progress span { height: 4px; border-radius: 2px; background: var(--ink-3); transition: background-color .5s var(--ease); }
 .progress .done { background: var(--paper); }
 .progress .next { background: #5A5A5A; }
 
@@ -106,9 +108,9 @@ a { color: var(--blue); }
   font: 600 16px/1.2 var(--text);
   text-align: center;
   text-decoration: none;
-  transition: transform .12s ease, background-color .2s ease;
+  transition: transform .35s var(--ease), background-color .25s ease, border-color .25s ease;
 }
-.btn:active { transform: scale(.98); }
+.btn:active { transform: scale(.96); transition-duration: .08s; }
 .btn--red { background: var(--red); color: var(--on-accent); }
 .btn--ghost { background: transparent; color: var(--paper); border: 1px solid var(--line); }
 .btn + .btn { margin-top: 10px; }
@@ -123,22 +125,22 @@ a { color: var(--blue); }
 .section__lead { margin: 0 0 16px; color: var(--muted); font-size: 15px; }
 
 /* Маршрут: шаги пути новичка */
-.route { list-style: none; margin: 0; padding: 0; position: relative; }
-.route::before {
-  content: "";
-  position: absolute;
-  left: 17px; top: 18px; bottom: 18px;
-  border-left: 1px solid var(--line);
-}
+.route { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .stop {
   position: relative;
   display: grid;
   grid-template-columns: 36px 1fr;
   gap: 14px;
-  padding: 10px 0;
+  padding: 12px 14px;
   width: 100%;
   text-align: left;
+  border-radius: var(--radius);
+  background: var(--ink-2);
+  border: 1px solid var(--line);
+  transition: transform .35s var(--ease), border-color .25s ease, background-color .25s ease;
 }
+.stop:active { transform: scale(.98); transition-duration: .08s; }
+.stop.next { border-color: var(--paper); }
 .stop__mark {
   width: 36px; height: 36px;
   border-radius: 50%;
@@ -149,27 +151,33 @@ a { color: var(--blue); }
   color: var(--muted);
 }
 .stop.done .stop__mark { background: var(--red); border-color: var(--red); color: var(--on-accent); }
-.stop.next .stop__mark { border-color: var(--paper); color: var(--paper); }
-.stop__name { display: block; font-weight: 600; line-height: 1.3; padding-top: 7px; }
+.stop.next .stop__mark { background: var(--paper); border-color: var(--paper); color: var(--on-accent); }
+.stop__name { display: block; font-weight: 600; line-height: 1.3; padding-top: 2px; }
 .stop__hint { display: block; color: var(--muted); font-size: 14px; margin-top: 2px; }
 
 /* Списки уроков */
-.lessons { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.lessons { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .lesson {
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
   gap: 14px;
   width: 100%;
-  padding: 15px 0;
-  border-bottom: 1px solid var(--line);
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  background: var(--ink-2);
+  border: 1px solid var(--line);
   text-align: left;
+  transition: transform .35s var(--ease), border-color .25s ease, background-color .25s ease;
 }
+.lesson:active { transform: scale(.98); background: var(--ink-3); border-color: var(--paper); transition-duration: .08s; }
+@media (hover: hover) { .lesson:hover, .stop:hover { border-color: #5A5A5A; } }
 .lesson__name { display: block; font-weight: 600; line-height: 1.3; }
 .lesson__meta { display: block; margin-top: 3px; color: var(--muted); font-size: 14px; }
 .lesson__state { width: 22px; height: 22px; color: var(--muted); }
 .lesson__state svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.lesson.done .lesson__state { color: var(--red); }
+.lesson.done .lesson__state { color: var(--paper); }
+.lesson.done { background: var(--ink); }
 
 .group-head {
   display: flex;
@@ -218,12 +226,15 @@ a { color: var(--blue); }
   border-radius: var(--radius);
 }
 
-.links { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.links { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .links button, .links a {
   display: flex; justify-content: space-between; align-items: center;
-  width: 100%; padding: 15px 0; border-bottom: 1px solid var(--line);
+  width: 100%; padding: 14px 16px;
+  border-radius: var(--radius); background: var(--ink-2); border: 1px solid var(--line);
   color: var(--paper); text-decoration: none; text-align: left;
+  transition: transform .35s var(--ease), border-color .25s ease;
 }
+.links button:active, .links a:active { transform: scale(.98); border-color: var(--paper); transition-duration: .08s; }
 .links small { color: var(--muted); font-size: 14px; }
 
 /* ---------- Читалка урока ---------- */
@@ -284,15 +295,17 @@ a { color: var(--blue); }
 /* ---------- Нижние вкладки ---------- */
 .tabs {
   position: fixed;
-  left: 0; right: 0; bottom: 0;
+  left: 12px; right: 12px; bottom: calc(10px + var(--safe-b));
+  max-width: 536px;
+  margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  height: calc(var(--tabs-h) + var(--safe-b));
-  padding-bottom: var(--safe-b);
-  /* На широком окне (Telegram на компьютере) вкладки держатся по ширине колонки */
-  padding-inline: max(0px, calc((100vw - 560px) / 2));
-  background: rgba(24, 24, 24, .94);
-  border-top: 1px solid var(--line);
+  gap: 6px;
+  height: var(--tabs-h);
+  padding: 6px;
+  background: rgba(33, 33, 33, .9);
+  border: 1px solid var(--line);
+  border-radius: 20px;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   z-index: 10;
@@ -303,16 +316,18 @@ a { color: var(--blue); }
   color: var(--muted);
   font-size: 12px;
   font-weight: 500;
+  border-radius: 14px;
+  transition: background-color .35s var(--ease), color .35s var(--ease), transform .35s var(--ease);
 }
+.tab:active { transform: scale(.94); transition-duration: .08s; }
 .tab svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linejoin: round; stroke-linecap: round; }
-.tab[aria-current="page"] { color: var(--paper); }
-.tab[aria-current="page"] svg { stroke: var(--red); }
+.tab[aria-current="page"] { background: var(--paper); color: var(--on-accent); font-weight: 600; }
 body.reading .tabs { display: none; }
 body.reading .app { padding-bottom: calc(var(--safe-b) + 32px); }
 
 /* ---------- Нижний лист ---------- */
 .sheet { position: fixed; inset: 0; z-index: 20; }
-.sheet__scrim { position: absolute; inset: 0; background: rgba(0, 0, 0, .7); }
+.sheet__scrim { position: absolute; inset: 0; background: rgba(0, 0, 0, .7); animation: fade .3s ease-out; }
 .sheet__panel {
   position: absolute;
   left: 0; right: 0; bottom: 0;
@@ -321,13 +336,22 @@ body.reading .app { padding-bottom: calc(var(--safe-b) + 32px); }
   padding: 22px var(--gutter) calc(22px + var(--safe-b));
   background: var(--ink-2);
   border-top: 1px solid var(--line);
-  border-radius: 18px 18px 0 0;
-  animation: rise .22s ease-out;
+  border-radius: 22px 22px 0 0;
+  animation: rise .45s var(--ease);
 }
 .sheet__panel h2 { margin: 0 0 6px; font: 600 21px/1.2 var(--display); letter-spacing: -.02em; }
 .sheet__panel p { margin: 0 0 18px; color: #D6D6D6; }
 
-@keyframes rise { from { transform: translateY(24px); opacity: 0; } }
+@keyframes rise { from { transform: translateY(100%); } }
+@keyframes fade { from { opacity: 0; } }
+
+/* Вход экрана: блоки поднимаются по очереди */
+.app.enter > *, body:not(.booted) .app > * { animation: enter .6s var(--ease) backwards; }
+.app.enter > :nth-child(2), body:not(.booted) .app > :nth-child(2) { animation-delay: .06s; }
+.app.enter > :nth-child(3), body:not(.booted) .app > :nth-child(3) { animation-delay: .12s; }
+.app.enter > :nth-child(4), body:not(.booted) .app > :nth-child(4) { animation-delay: .18s; }
+.app.enter > :nth-child(n+5), body:not(.booted) .app > :nth-child(n+5) { animation-delay: .24s; }
+@keyframes enter { from { opacity: 0; transform: translateY(14px); } }
 
 /* Полоска прогресса заполняется при первом открытии */
 body:not(.booted) .progress .done { animation: fill .5s ease-out backwards; transform-origin: left; }
