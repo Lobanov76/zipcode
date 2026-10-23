@@ -52,6 +52,7 @@ AVATARS = [
     ("avatar-bot", "private"),
     ("avatar-chat", "chat"),
     ("avatar-club", "club"),
+    ("avatar-club-chat", "club chat"),
 ]
 
 

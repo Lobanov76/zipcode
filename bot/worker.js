@@ -126,10 +126,17 @@ export default {
       const form = await request.formData();
       if (!env.ADMIN_KEY || form.get("key") !== env.ADMIN_KEY) return new Response("Нет доступа", { status: 403 });
       const method = form.get("method");
-      if (!["sendAnimation", "sendMessage", "editMessageText", "editMessageCaption", "editMessageMedia", "pinChatMessage"].includes(method)) return new Response("Метод запрещён", { status: 400 });
+      if (!["sendAnimation", "sendMessage", "editMessageText", "editMessageCaption", "editMessageMedia", "setChatPhoto", "setChatDescription", "pinChatMessage"].includes(method)) return new Response("Метод запрещён", { status: 400 });
       form.delete("key");
       form.delete("method");
-      form.set("chat_id", env.CLUB_CHAT_ID);
+      // target=chat — группа обсуждения клуба (её id берём у Telegram, а не из кода)
+      let chat = env.CLUB_CHAT_ID;
+      if (form.get("target") === "chat") {
+        const info = await tg(env, "getChat", { chat_id: env.CLUB_CHAT_ID });
+        chat = info.result && info.result.linked_chat_id;
+      }
+      form.delete("target");
+      form.set("chat_id", chat);
       const res = await fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/${method}`, { method: "POST", body: form });
       return Response.json(await res.json());
     }
