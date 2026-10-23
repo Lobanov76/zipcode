@@ -120,6 +120,20 @@ export default {
       return json({ url: `https://t.me/${env.PAY_USERNAME}?text=${encodeURIComponent(text)}` });
     }
 
+    // Публикация уроков в zipcode club с компьютера Артёма: POST /admin/tg (multipart, поле key = ADMIN_KEY).
+    // Пишет только в закрытый канал и только разрешёнными методами — тексты уроков в код не попадают
+    if (url.pathname === "/admin/tg" && request.method === "POST") {
+      const form = await request.formData();
+      if (!env.ADMIN_KEY || form.get("key") !== env.ADMIN_KEY) return new Response("Нет доступа", { status: 403 });
+      const method = form.get("method");
+      if (!["sendAnimation", "sendMessage", "editMessageText", "editMessageCaption", "editMessageMedia", "pinChatMessage"].includes(method)) return new Response("Метод запрещён", { status: 400 });
+      form.delete("key");
+      form.delete("method");
+      form.set("chat_id", env.CLUB_CHAT_ID);
+      const res = await fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/${method}`, { method: "POST", body: form });
+      return Response.json(await res.json());
+    }
+
     // Проверка, что бот видит закрытый канал: /club?key=WEBHOOK_SECRET
     if (url.pathname === "/club") {
       if (url.searchParams.get("key") !== env.WEBHOOK_SECRET) return new Response("Нет доступа", { status: 403 });

@@ -188,7 +188,7 @@
   function lessonRow(l, locked) {
     const icon = isDone(l.id) ? ICON.done : locked ? ICON.lock : ICON.open;
     return `<li><button class="lesson ${isDone(l.id) ? "done" : ""}" data-${locked ? "paid" : "lesson"}="${l.id}">
-      <span><span class="lesson__name">${esc(l.title)}</span><span class="lesson__meta">${l.minutes} мин</span></span>
+      <span><span class="lesson__name">${esc(l.title)}</span><span class="lesson__meta">${locked ? `Урок ${l.id[0]}.${l.id[1]}, ` : ""}${l.minutes} мин</span></span>
       <span class="lesson__state">${icon}</span>
     </button></li>`;
   }
