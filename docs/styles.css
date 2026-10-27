@@ -413,3 +413,6 @@ body.splashing .app > * { animation: none !important; opacity: 0; }
   .splash__mark span, .splash__mark b { opacity: 1; filter: none; transform: none; }
   .splash__bar i::after { transform: none; }
 }
+
+.tabs.tabs--two { grid-template-columns: repeat(2, 1fr); }
+.tab[hidden] { display: none; }

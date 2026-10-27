@@ -46,7 +46,14 @@
   };
 
   const isDone = (id) => state.done.includes(id);
+  // Счётчик воронки: на сервер уходит только название действия, без данных о человеке
+  function track(e) {
+    if (!CFG.apiUrl) return;
+    fetch(`${CFG.apiUrl}/api/event`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ e }), keepalive: true }).catch(() => {});
+  }
+
   function markDone(id) {
+    if (id === "03-day-3" && !isDone(id)) track("day3");
     if (!isDone(id)) state.done.push(id);
     store.save();
     haptic("success");
@@ -67,8 +74,13 @@
     { name: "Собери первую страницу", hint: "Вечер 1: мастерская", done: () => isDone("01-day-1"), go: () => openLesson("01-day-1") },
     { name: "Сделай сайт о себе", hint: "Вечер 2: агент берёт интервью", done: () => isDone("02-day-2"), go: () => openLesson("02-day-2") },
     { name: "Получи свой адрес в интернете", hint: "Вечер 3: ссылка и QR-код", done: () => isDone("03-day-3"), go: () => openLesson("03-day-3") },
-    { name: "Открой курс участников", hint: `${CFG.price} ${CFG.period}`, done: () => state.member, go: () => setTab("access") },
-    { name: "Найди первого клиента", hint: "Финал блока «Сайты»", done: () => isDone("25-first-client") && isDone("26-deal"), go: () => openPaid("25-first-client") },
+    ...(CFG.clubOpen ? [
+      { name: "Открой курс участников", hint: `${CFG.price} ${CFG.period}`, done: () => state.member, go: () => setTab("access") },
+      { name: "Найди первого клиента", hint: "Финал блока «Сайты»", done: () => isDone("25-first-client") && isDone("26-deal"), go: () => openPaid("25-first-client") },
+    ] : [
+      { name: "Подпишись на канал zipcode", hint: "Разборы, ниши и фишки каждую неделю", done: () => isDone("x-channel"), go: () => { markDone("x-channel"); openLink(CFG.channelLink); render(); } },
+      { name: "Покажи свой сайт", hint: "Ссылка в комментариях — разберём", done: () => isDone("x-show"), go: () => { markDone("x-show"); openLink(CFG.channelLink); render(); } },
+    ]),
   ];
 
   const nextStop = () => route.findIndex((s) => !s.done());
@@ -218,7 +230,7 @@
         <ul class="lessons">${days.map((l) => lessonRow(l, false)).join("")}</ul>
       </section>
 
-      <section class="section">
+      ${CFG.clubOpen ? `<section class="section">
         <div class="group-head"><h2 class="section__title">Курс участников</h2><span class="count">${paidDone} из ${paid.length}</span></div>
         <p class="section__lead">4 направления в закрытом канале zipcode club. ${state.member ? "Нажми на урок, чтобы открыть его." : `Доступ — ${CFG.price} ${CFG.period}.`}</p>
       </section>
@@ -229,7 +241,11 @@
           <p class="section__lead">${esc(t.lead)}</p>
           ${items.length ? `<ul class="lessons">${items.map((l) => lessonRow(l, true)).join("")}</ul>` : ""}
         </section>`;
-      }).join("")}`;
+      }).join("")}` : `<section class="section">
+        <h2 class="section__title">Дальше — в канале</h2>
+        <p class="section__lead">Ниши, разборы сайтов и роликов, фишки Claude — каждую неделю в zipcode.</p>
+        <button class="btn btn--red" data-open="channel">Открыть канал</button>
+      </section>`}`;
   }
 
   function accessView() {
@@ -284,7 +300,7 @@
     const idx = free.findIndex((x) => x.id === id);
     const after = free[idx + 1];
     const doneBtn = isDone(id)
-      ? (after ? `<button class="btn btn--red" data-lesson="${after.id}">Дальше: ${esc(after.title)}</button>` : `<button class="btn btn--red" data-tab-go="access">Открыть курс участников</button>`)
+      ? (after ? `<button class="btn btn--red" data-lesson="${after.id}">Дальше: ${esc(after.title)}</button>` : (CFG.clubOpen ? `<button class="btn btn--red" data-tab-go="access">Открыть курс участников</button>` : `<button class="btn btn--red" data-open="channel">Дальше — в канале zipcode</button>`))
       : `<button class="btn btn--red" data-action="done" data-id="${id}">Отметить пройденным</button>`;
     return `
       <button class="reader__back" data-back>${ICON.back} Назад</button>
@@ -304,6 +320,9 @@
       : tab === "course" ? courseView()
       : tab === "access" ? accessView()
       : homeView();
+    // Пока клуб скрыт, вкладки «Доступ» нет
+    document.querySelector('.tab[data-tab="access"]').hidden = !CFG.clubOpen;
+    document.querySelector(".tabs").classList.toggle("tabs--two", !CFG.clubOpen);
     document.querySelectorAll(".tab").forEach((b) => {
       if (b.dataset.tab === tab) b.setAttribute("aria-current", "page");
       else b.removeAttribute("aria-current");
@@ -327,6 +346,7 @@
   }
 
   function openLesson(id) {
+    track("lesson");
     reading = id;
     render();
     enter();
@@ -353,6 +373,7 @@
      Оплата через личку автора. Ник лежит на сервере, в публичный код не попадает. */
 
   function buy() {
+    track("buy");
     showSheet("Оформить подписку", "Выбери срок — откроется личка автора с готовым сообщением.", [
       { label: `1 месяц — ${CFG.price}`, cls: "btn--red", run: () => openPay("1m") },
       { label: `3 месяца — ${CFG.price3}`, cls: "btn--ghost", run: () => openPay("3m") },
@@ -360,6 +381,7 @@
   }
 
   async function openPay(plan) {
+    track(plan === "3m" ? "pay_3m" : "pay_1m");
     try {
       const res = await fetch(`${CFG.apiUrl}/api/pay-link?plan=${plan}`);
       const data = await res.json();
@@ -376,6 +398,7 @@
     if (!state.member) await checkAccess();
     if (!state.member) {
       haptic("warning");
+      track("paid_tap");
       buy();
       return;
     }
@@ -496,5 +519,6 @@
     render();
     checkAccess();
     hideSplash();
+    track("open");
   });
 })();
